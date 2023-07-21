@@ -53,16 +53,48 @@ def getCurrentWeather(codigoLocal, nomeLocal):
         except:
             return None
 
+def getForecast(codigoLocal):
+    DailyAPIUrl = 'http://dataservice.accuweather.com/forecasts/v1/daily/5day/' + codigoLocal + '?apikey=' + accuweatherAPIKey + '&language=pt-br&metric=true'
+    r = requests.get(DailyAPIUrl)
+    if (r.status_code != 200):
+        print('Não foi possível obter o clima atual.')
+        return None
+    else:
+        try:
+            DailyResponse = json.loads(r.text)
+            infoClima5Dias = []
+            for dia in DailyResponse['DailyForecasts']:
+                climaDia = {}
+                climaDia['max'] = dia['Temperature']['Maximum']['Value']
+                climaDia['min'] = dia['Temperature']['Minimum']['Value']
+                climaDia['clima'] = dia['Day']['IconPhrase']
+                climaDia['dia'] = dia['EpochDate']
+                infoClima5Dias.append(climaDia)
+            return infoClima5Dias
+        except:
+            return None
+
+
 ## Início do programa
 
-coordenadas = getCoordinates()
-
 try:
+    coordenadas = getCoordinates()
     local = getLocalCode(coordenadas['lat'], coordenadas['long'])
     climaAtual = getCurrentWeather(local['codigoLocal'], local['nomeLocal'])
     print('Clima atual em: ' + climaAtual['nomeLocal'])
     print(climaAtual['textoClima'])
     print('Temperatura: ' + str(climaAtual['temperatura']) + '\xb0' + 'C')
+
+    print('\nClima para hoje e para os próximos dias:\n')
+
+    previsao5Dias = getForecast(local['codigoLocal'])
+    for dia in previsao5Dias:
+        print(dia['dia'])
+        print('Máxima: ' + str(dia['max']) + '\xb0' + 'C')
+        print('Mínima: ' + str(dia['min']) + '\xb0' + 'C')
+        print('Clima: ' + dia['clima'])
+        print('-------------------------------')
+    
 except:
     print('Erro ao processar a solicitação. Entre em contato com o suporte.')
     
