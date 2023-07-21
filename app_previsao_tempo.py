@@ -1,7 +1,9 @@
 import requests
 import json
+from datetime import date
 
 accuweatherAPIKey = '0uTw0Jnxw3Re7goG68xXxnAm5ijwl4V6'
+dias_semana = ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado']
 
 def getCoordinates():
     r = requests.get('http://www.geoplugin.net/json.gp')
@@ -68,7 +70,8 @@ def getForecast(codigoLocal):
                 climaDia['max'] = dia['Temperature']['Maximum']['Value']
                 climaDia['min'] = dia['Temperature']['Minimum']['Value']
                 climaDia['clima'] = dia['Day']['IconPhrase']
-                climaDia['dia'] = dia['EpochDate']
+                diaSemana = int(date.fromtimestamp(dia['EpochDate']).strftime("%w"))
+                climaDia['dia'] = dias_semana[diaSemana]
                 infoClima5Dias.append(climaDia)
             return infoClima5Dias
         except:
@@ -85,7 +88,7 @@ try:
     print(climaAtual['textoClima'])
     print('Temperatura: ' + str(climaAtual['temperatura']) + '\xb0' + 'C')
 
-    print('\nClima para hoje e para os próximos dias:\n')
+    print('\nClima para hoje e para os próximos 5 dias:\n')
 
     previsao5Dias = getForecast(local['codigoLocal'])
     for dia in previsao5Dias:
