@@ -77,26 +77,41 @@ def getForecast(codigoLocal):
         except:
             return None
 
+def showForecast(lat, long):
+    try:
+        local = getLocalCode(lat, long)
+        climaAtual = getCurrentWeather(local['codigoLocal'], local['nomeLocal'])
+        print('Clima atual em: ' + climaAtual['nomeLocal'])
+        print(climaAtual['textoClima'])
+        print('Temperatura: ' + str(climaAtual['temperatura']) + '\xb0' + 'C')
+    except:
+        print('Erro ao obter o clima atual.')
+    
+    opcao = input('Deseja visualizar a previsão para os próximos dias? (S ou N) ').lower()
+
+    if opcao == "s":
+        print('\nClima para hoje e para os próximos 5 dias:\n')
+
+        try:
+            previsao5Dias = getForecast(local['codigoLocal'])
+            for dia in previsao5Dias:
+                print(dia['dia'])
+                print('Máxima: ' + str(dia['max']) + '\xb0' + 'C')
+                print('Mínima: ' + str(dia['min']) + '\xb0' + 'C')
+                print('Clima: ' + dia['clima'])
+                print('-------------------------------')
+        except:
+            print('Erro ao obter a previsão para os próximos dias.')
+
+    else:
+        print('Você saiu do programa.')
 
 ## Início do programa
 
 try:
     coordenadas = getCoordinates()
-    local = getLocalCode(coordenadas['lat'], coordenadas['long'])
-    climaAtual = getCurrentWeather(local['codigoLocal'], local['nomeLocal'])
-    print('Clima atual em: ' + climaAtual['nomeLocal'])
-    print(climaAtual['textoClima'])
-    print('Temperatura: ' + str(climaAtual['temperatura']) + '\xb0' + 'C')
-
-    print('\nClima para hoje e para os próximos 5 dias:\n')
-
-    previsao5Dias = getForecast(local['codigoLocal'])
-    for dia in previsao5Dias:
-        print(dia['dia'])
-        print('Máxima: ' + str(dia['max']) + '\xb0' + 'C')
-        print('Mínima: ' + str(dia['min']) + '\xb0' + 'C')
-        print('Clima: ' + dia['clima'])
-        print('-------------------------------')
+    showForecast(coordenadas['lat'], coordenadas['long'])
+    
     
 except:
     print('Erro ao processar a solicitação. Entre em contato com o suporte.')
